@@ -1,0 +1,17 @@
+setuptools==70.0.0
+numpy>=1.24
+scipy>=1.10
+pandas>=2.0
+matplotlib>=3.7
+corner>=2.2
+tqdm>=4.65
+healpy>=1.16
+astropy>=5.3
+psrqpy>=1.0
+libstempo>=2.4
+enterprise-pulsar>=3.3
+enterprise-extensions>=3.0
+dynesty>=2.1
+ptmcmcsampler>=1.0
+colorlog>=6.7
+jupyter>=1.0
