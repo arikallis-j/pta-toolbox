@@ -14,17 +14,17 @@ class DataManager:
 
         for path in self.locals.iterdir():
             if path.is_file():
-                self.copy_from_locals(path.name)
+                self._copy_from_locals(path.name)
 
     def create_experiment(self, name):
-        self.experiment = self.root / name
-        self.experiment.mkdir(exist_ok=True)
-        return self.experiment
+        experiment = self.root / name
+        experiment.mkdir(exist_ok=True)
+        return experiment
 
     def get_storage_path(self, filename=""):
         target = self.storage / filename
         return target
 
-    def copy_from_locals(self, filename):
+    def _copy_from_locals(self, filename):
         shutil.copy(self.locals / filename, self.storage / filename)
         return self.storage / filename

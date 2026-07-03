@@ -1,6 +1,8 @@
 import psrqpy
 import pandas as pd
 
+# Data processing
+
 def load_data(path, name):
     data = pd.read_pickle(path / f"{name}.pkl")
     return data
@@ -8,28 +10,23 @@ def load_data(path, name):
 def dump_data(data, path, name='data'):
     data.to_pickle(path / f"{name}.pkl")
 
-def load_atnf(path, update=False):
-    if update:
-        update_atnf(path)
+# ATNF working
+
+def load_atnf(path):
     storage = path.parent / ".storage"
-    atnf = pd.read_pickle(storage / "atnf.pkl")
+    atnf = load_data(storage, 'atnf')
     return atnf
 
-def load_atnf_catalog(path, update=False):
-    if update:
-        update_atnf_catalog(path)
-    storage = path.parent / ".storage"
-    catalog = pd.read_pickle(storage / "atnf_cat.pkl")
-    return catalog
-
-def update_atnf(path):
-    storage = path.parent / ".storage"
+def download_atnf(path):
     atnf = psrqpy.QueryATNF().pandas
-    atnf.to_pickle(storage / "atnf.pkl")
+    dump_data(atnf, path, 'atnf')
+    return atnf
 
-def update_atnf_catalog(path):
+def load_cut_atnf(path):
     storage = path.parent / ".storage"
-    catalog = load_atnf_catalog(path)
-    atnf = update_atnf(path)
-    catalog = atnf[atnf['PSRJ'].isin(catalog['PSRJ'])].reset_index()[catalog.columns]
-    catalog.to_pickle(storage / "atnf_cat.pkl")
+    atnf_cut = load_data(storage, 'cut_atnf')
+    return atnf_cut
+
+def cut_atnf(atnf, template):
+    atnf_cut = atnf[atnf['PSRJ'].isin(template['PSRJ'])].reset_index()[template.columns]
+    return atnf_cut

@@ -39,10 +39,3 @@ def make_pulsars(data):
 def make_data(pulsars):
     data = pd.DataFrame(pulsars).rename(columns=atnf_format)
     return data
-
-def make_test_array(n_psr):
-    pulsars = []
-    for k in range(n_psr):
-        psr = Pulsar(name=f"J{k}", ra=k/n_psr * 360, dec=0.0)
-        pulsars.append(psr)
-    return pulsars

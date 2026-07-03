@@ -1,18 +1,16 @@
 import ptatoolbox as pta
 
-import pandas as pd
-
 dm = pta.DataManager(root_dir='./data')
 path = dm.create_experiment("test")
-storage = path.parent / ".storage"
-atnf = pta.load_catalog(storage, 'atnf')
-catalog = pta.make_catalog(key='atnf', params={'base': atnf})
-print(catalog.data)
+storage = dm.storage
 
-tempo_format = {
-    'RAJD': 'RAJ',
-    'DECJD': 'DECJ',
-}
-   
-def tempo_data(data):
-    return data.rename(columns=tempo_format)
+# Isotropic distribution on a sphere with 1 kpc radius
+sphere = pta.make_catalog(
+    n_psr = 1000,
+    name='sphere', 
+    method='sphere',
+    params={'seed_psr': 42, 'radius': 1.0}
+)
+print(sphere)
+pta.plot_catalog(sphere, path)
+pta.plot_pulsars(sphere, path)
