@@ -8,9 +8,8 @@ storage = dm.storage
 # Load pre-cut atnf catalog 
 cut_atnf = pta.load_catalog(storage, pta.CUT_ATNF_STEM, prefix=False)
 print(cut_atnf.sample(n_psr=100, seed=42))
-
 # Make synthetic mixed with pre-cut atnf catalog by method `cone`
-catalog = pta.make_mixed_catalog(
+catalog = pta.make_catalog(
     real_catalog=cut_atnf,
     n_psr=100,
     seed=42,

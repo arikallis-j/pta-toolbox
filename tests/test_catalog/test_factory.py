@@ -26,7 +26,7 @@ sample = cut_atnf.sample(n_psr=10, seed=42)
 print(sample)
 
 # Make synthetic mixed with real catalog by method `test`
-catalog = pta.make_mixed_catalog(
+catalog = pta.make_catalog(
     n_psr = 10,
     real_catalog=cut_atnf,
     name='new',

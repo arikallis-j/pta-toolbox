@@ -19,20 +19,21 @@ def save_catalog(catalog: Catalog, path: Path, prefix: bool = True) -> None:
     stem = f"{catalog.name}_cat" if prefix else catalog.name
     dump_data(catalog.data, path, stem)
 
-def make_catalog(n_psr: int, name: str = 'sample', method: str = 'test', params: Optional[Dict[str, Any]] = None) -> Catalog:
+def make_synthetic_catalog(n_psr: int, name: Optional[str] = None, method: Optional[str] = 'test', params: Optional[Dict[str, Any]] = None) -> Catalog:
     """Create a fully synthetic catalog."""
     params = params or {}
+    name = name or 'sample'
     data = make_synthetics(n_psr, method, params)
     return Catalog(data, name=name)
 
 def make_mixed_catalog(
     real_catalog: Catalog, 
     n_psr: Optional[int] = None,
+    name: Optional[str] = None,
     method: str = 'test', 
     params: Optional[Dict[str, Any]] = None, 
     seed: int = 42, 
     fields: Optional[List[str]] = ['PSRJ', 'RAJD', 'DECJD'], 
-    name: Optional[str] = None
 ) -> Catalog:
     """Create a mixed catalog by replacing specified fields with synthetic values."""
     if name is None:
@@ -54,3 +55,34 @@ def make_mixed_catalog(
             sampled_df[col] = float('nan')
     
     return Catalog(data=sampled_df, name=final_name)
+
+
+def make_catalog(
+    n_psr: int,
+    real_catalog: Optional[Catalog] = None, 
+    name: Optional[str] = None,
+    method: str = 'test', 
+    params: Optional[Dict[str, Any]] = None, 
+    seed: int = 42, 
+    fields: Optional[List[str]] = ['PSRJ', 'RAJD', 'DECJD'], 
+) -> Catalog:
+    """Create a catalog."""
+    if real_catalog is None:
+        catalog = make_synthetic_catalog(
+            n_psr=n_psr, 
+            name=name, 
+            method=method, 
+            params=params
+        )
+    else:
+        catalog = make_mixed_catalog(
+            real_catalog=real_catalog,
+            n_psr=n_psr,
+            name=name,
+            method=method,
+            params=params,
+            seed=seed,
+            fields=fields,
+        )
+
+    return catalog
