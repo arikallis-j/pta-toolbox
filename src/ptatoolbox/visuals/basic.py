@@ -2,9 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def get_cartesian(ra, dec, px):
+    ra = np.asarray(ra, dtype=float)
+    dec = np.asarray(dec, dtype=float)
+    px = np.asarray(px, dtype=float)
     ra = np.deg2rad(ra)
     dec = np.deg2rad(dec)
     D = np.where((px > 0) & np.isfinite(px), 1 / px, np.nan)
+    
     x = D * np.cos(dec) * np.cos(ra)
     y = D * np.cos(dec) * np.sin(ra)
     z = D * np.sin(dec)

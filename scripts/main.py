@@ -1,16 +1,25 @@
 import ptatoolbox as pta
 
-dm = pta.DataManager(root_dir='./data')
+# Create experiment directory
+dm = pta.DataManager()
 path = dm.create_experiment("test")
 storage = dm.storage
 
-# Isotropic distribution on a sphere with 1 kpc radius
-sphere = pta.make_catalog(
-    n_psr = 1000,
-    name='sphere', 
-    method='sphere',
-    params={'seed_psr': 42, 'radius': 1.0}
+# Load pre-cut atnf catalog 
+cut_atnf = pta.load_catalog(storage, pta.CUT_ATNF_STEM, prefix=False)
+print(cut_atnf.sample(n_psr=100, seed=42))
+
+# Make synthetic mixed with pre-cut atnf catalog by method `cone`
+catalog = pta.make_mixed_catalog(
+    real_catalog=cut_atnf,
+    n_psr=100,
+    seed=42,
+    name='test', 
+    method='cone',
+    params={'seed_psr': 42, 'alpha': 20.0, 'ra_0': 0.0, 'dec_0': 0.0},
+    fields=['PSRJ', 'RAJD', 'DECJD']
 )
-print(sphere)
-pta.plot_catalog(sphere, path)
-pta.plot_pulsars(sphere, path)
+
+print(catalog)
+pta.plot_catalog(catalog, path)
+pta.plot_pulsars(catalog, path)

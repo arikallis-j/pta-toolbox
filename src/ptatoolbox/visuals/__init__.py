@@ -1,1 +1,1 @@
-from .basic import *
+from .basic import plot_catalog, plot_pulsars

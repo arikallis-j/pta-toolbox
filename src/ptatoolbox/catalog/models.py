@@ -1,88 +1,71 @@
+"""Synthetic pulsar catalog generators."""
+
 import numpy as np
+import pandas as pd
+from typing import Dict, List, Any, Optional
 
-from .io import *
-from .pulsar import *
-from .distr import *
-from .names import *
+from .funcs import (
+    psr2sph, sph2psr, get_names,
+    isotropic_sphere, isotropic_ball, 
+    isotropic_cap, isotropic_cone, isotropic_ring,
+)
+from .pulsar import Pulsar, make_data
 
-def get_psr_coord(phi, theta, rho=np.nan):
-    ra = np.rad2deg(phi)
-    dec = np.rad2deg(np.pi/2.0 - theta)
-    px = 1/rho
-    return ra, dec, px # (deg, deg, mas)
+def _make_pulsar_dicts(Phi: np.ndarray, Theta: np.ndarray, Rho: np.ndarray, prefix: str = 'S') -> List[Dict[str, Any]]:
+    """Convert spherical coordinates to list of pulsar parameter dicts."""
+    Ra, Dec, Px = sph2psr(Phi, Theta, Rho)
+    names = get_names(Ra, Dec, prefix=prefix)
+    return [
+        {'name': name, 'ra': ra, 'dec': dec, 'px': px}
+        for name, ra, dec, px in zip(names, Ra, Dec, Px)
+    ]
 
-def get_sph_coord(ra, dec, px=np.nan):
-    phi = np.deg2rad(ra)
-    theta = np.pi/2.0 - np.deg2rad(dec)
-    rho = 1/px
-    return phi, theta, rho # (rad, rad, kpc)
-
-def simple_test(n_psr):
+def simple_test(n_psr: int) -> List[Dict[str, Any]]:
+    """Simplest generator: isotropic sphere with default parameters, no px."""
     Phi, Theta, Rho = isotropic_sphere(n_psr, 42, np.nan)
-    Ra, Dec, Px = get_psr_coord(Phi, Theta, Rho)
-    Name = [f"S{k}" for k in range(n_psr)]
+    Ra, Dec, _ = sph2psr(Phi, Theta, Rho)
+    names = [f"S{k}" for k in range(n_psr)]
     return [
-        {'name': name, 'ra': ra, 'dec': dec} 
-        for name, ra, dec in zip(Name, Ra, Dec)
+        {'name': name, 'ra': ra, 'dec': dec, 'px': np.nan}
+        for name, ra, dec in zip(names, Ra, Dec)
     ]
 
-def simple_sphere(n_psr, seed_psr=42, radius=np.nan):
+def simple_sphere(n_psr: int, seed_psr: int = 42, radius: float = np.nan) -> List[Dict[str, Any]]:
+    """Isotropic distribution on a sphere."""
     Phi, Theta, Rho = isotropic_sphere(n_psr, seed_psr, radius)
-    Ra, Dec, Px = get_psr_coord(Phi, Theta, Rho)
-    Name = get_names(Ra, Dec, prefix='S')
-    return [
-        {'name': name, 'ra': ra, 'dec': dec, 'px': px} 
-        for name, ra, dec, px in zip(Name, Ra, Dec, Px)
-    ]
+    return _make_pulsar_dicts(Phi, Theta, Rho)
 
-def simple_ball(n_psr, seed_psr=42, radius=1):
+def simple_ball(n_psr: int, seed_psr: int = 42, radius: float = 1.0) -> List[Dict[str, Any]]:
+    """Uniform distribution inside a ball."""
     Phi, Theta, Rho = isotropic_ball(n_psr, seed_psr, radius)
-    Ra, Dec, Px = get_psr_coord(Phi, Theta, Rho)
-    Name = get_names(Ra, Dec, prefix='S')
-    return [
-        {'name': name, 'ra': ra, 'dec': dec, 'px': px} 
-        for name, ra, dec, px in zip(Name, Ra, Dec, Px)
-    ]
+    return _make_pulsar_dicts(Phi, Theta, Rho)
 
-def simple_cone(n_psr, seed_psr=42, alpha=10.0, ra_0=0.0, dec_0=0.0, radius=1):
-    phi_0, theta_0, _ = get_sph_coord(ra_0, dec_0)
+def simple_cone(n_psr: int, seed_psr: int = 42, alpha: float = 10.0, ra_0: float = 0.0, dec_0: float = 0.0, radius: float = 1.0) -> List[Dict[str, Any]]:
+    """Distribution within a cone."""
+    phi_0, theta_0, _ = psr2sph(ra_0, dec_0)
     Phi, Theta, Rho = isotropic_cone(n_psr, seed_psr, radius, phi_0, theta_0, np.deg2rad(alpha))
-    Ra, Dec, Px = get_psr_coord(Phi, Theta, Rho)
-    Name = get_names(Ra, Dec, prefix='S')
-    return [
-        {'name': name, 'ra': ra, 'dec': dec, 'px': px} 
-        for name, ra, dec, px in zip(Name, Ra, Dec, Px)
-    ]
+    return _make_pulsar_dicts(Phi, Theta, Rho)
 
-def simple_cap(n_psr, seed_psr=42, alpha=10.0, ra_0=0.0, dec_0=0.0, radius=np.nan):
-    phi_0, theta_0, _ = get_sph_coord(ra_0, dec_0)
+def simple_cap(n_psr: int, seed_psr: int = 42, alpha: float = 10.0, ra_0: float = 0.0, dec_0: float = 0.0, radius: float = np.nan) -> List[Dict[str, Any]]:
+    """Distribution on a spherical cap."""
+    phi_0, theta_0, _ = psr2sph(ra_0, dec_0)
     Phi, Theta, Rho = isotropic_cap(n_psr, seed_psr, radius, phi_0, theta_0, np.deg2rad(alpha))
-    Ra, Dec, Px = get_psr_coord(Phi, Theta, Rho)
-    Name = get_names(Ra, Dec, prefix='S')
-    return [
-        {'name': name, 'ra': ra, 'dec': dec, 'px': px} 
-        for name, ra, dec, px in zip(Name, Ra, Dec, Px)
-    ]
+    return _make_pulsar_dicts(Phi, Theta, Rho)
 
-def simple_ring(n_psr, seed_psr=42, alpha=10.0, ra_0=0.0, dec_0=0.0, radius=np.nan):
-    phi_0, theta_0, _ = get_sph_coord(ra_0, dec_0)
+def simple_ring(n_psr: int, seed_psr: int = 42, alpha: float = 10.0, ra_0: float = 0.0, dec_0: float = 0.0, radius: float = np.nan) -> List[Dict[str, Any]]:
+    """Distribution on a ring (circle) on the sphere."""
+    phi_0, theta_0, _ = psr2sph(ra_0, dec_0)
     Phi, Theta, Rho = isotropic_ring(n_psr, seed_psr, radius, phi_0, theta_0, np.deg2rad(alpha))
-    Ra, Dec, Px = get_psr_coord(Phi, Theta, Rho)
-    Name = get_names(Ra, Dec, prefix='S')
-    return [
-        {'name': name, 'ra': ra, 'dec': dec, 'px': px} 
-        for name, ra, dec, px in zip(Name, Ra, Dec, Px)
-    ]
+    return _make_pulsar_dicts(Phi, Theta, Rho)
 
-def make_synthetics(n_psr, method, params):
-    pulsars = [] 
+def make_synthetics(n_psr: int, method: str, params: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
+    """Generate a synthetic catalog as a DataFrame with ATNF columns."""
+    params = params or {}
     synth_data = methods[method](n_psr, **params)
-    for k in range(n_psr):
-        psr = Pulsar(**synth_data[k])
-        pulsars.append(psr)
-    data = make_data(pulsars)
-    return data 
+    pulsars = [Pulsar(**item) for item in synth_data]
+    return make_data(pulsars)
 
+# Registry of available synthetic generators
 methods = {
     'test': simple_test,
     'sphere': simple_sphere,

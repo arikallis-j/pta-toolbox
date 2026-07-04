@@ -2,7 +2,7 @@ import ptatoolbox as pta
 
 # Create experiment directory
 dm = pta.DataManager(root_dir='./data')
-path = dm.create_experiment("test-simple-cat")
+path = dm.create_experiment("test-models")
 storage = dm.storage
 
 # Make test synthetic catalog
