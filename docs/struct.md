@@ -10,7 +10,7 @@
 │   ├── manager.py 
 │   ├── pickle_io.py 
 │   └── atnf_io.py 
-├── catalog/
+├── catalogs/
 │   ├── __init__.py
 │   ├── pulsar.py 
 │   ├── catalog.py  

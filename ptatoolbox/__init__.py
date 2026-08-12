@@ -1,5 +1,6 @@
 from .io import *
 from .core import *
+from .visuals import *
 
 from .catalogs import *
-from .visuals import *
+from .gwb import *

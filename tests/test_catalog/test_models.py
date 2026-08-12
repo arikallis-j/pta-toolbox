@@ -25,28 +25,6 @@ print(sphere)
 pta.plot_catalog(sphere, path)
 pta.plot_pulsars(sphere, path)
 
-# Isotropic distribution in a ball with 1 kpc radius
-ball = pta.make_catalog(
-    n_psr = 1000,
-    name='ball', 
-    method='ball',
-    params={'seed_psr': 42, 'radius': 1.0}
-)
-print(ball)
-pta.plot_catalog(ball, path)
-pta.plot_pulsars(ball, path)
-
-# Isotropic distribution in a cone with 30.0 deg angle radius
-cone = pta.make_catalog(
-    n_psr = 1000,
-    name='cone', 
-    method='cone',
-    params={'seed_psr': 42, 'radius': 1.0,  'alpha': 30.0, 'ra_0': 0.0, 'dec_0': 0.0}
-)
-print(cone)
-pta.plot_catalog(cone, path)
-pta.plot_pulsars(cone, path)
-
 # Isotropic distribution on a cap with 30.0 deg angle radius
 cap = pta.make_catalog(
     n_psr = 1000,

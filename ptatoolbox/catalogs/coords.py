@@ -39,6 +39,11 @@ def vec2sph(vec):
     phi = np.where(phi < 0, phi + 2*np.pi, phi)
     return phi, theta
 
+def vec2psr(vec):
+    phi, theta = vec2sph(vec)
+    ra, dec, px = sph2psr(phi, theta)
+    return ra, dec
+
 def rotation_matrix_from_z(target):
     z_axis = np.array([0.0, 0.0, 1.0])
     if np.allclose(target, z_axis):
@@ -52,40 +57,31 @@ def rotation_matrix_from_z(target):
     R = np.eye(3) + np.sin(angle) * K + (1 - np.cos(angle)) * np.dot(K, K)
     return R
 
+
 # Distributions
 
-def isotropic_ball(n_array, seed, radius):
-    rng = np.random.default_rng(seed=seed)
-    phi = rng.uniform(0, 2*np.pi, n_array)
-    cos_theta = rng.uniform(-1, 1, n_array)
-    theta = np.arccos(cos_theta)
-    rho = radius * rng.uniform(0, 1, n_array) ** (1/3)
-    return phi, theta, rho
-
-def isotropic_sphere(n_array, seed, radius):
-    rng = np.random.default_rng(seed=seed)
+def isotropic_sphere(n_array, seed_coord=42, radius=np.nan):
+    rng = np.random.default_rng(seed=seed_coord)
     phi = rng.uniform(0, 2*np.pi, n_array)
     cos_theta = rng.uniform(-1, 1, n_array)
     theta = np.arccos(cos_theta)
     rho = radius * np.ones(n_array)
-    return phi, theta, rho
+    ra, dec, px = sph2psr(phi, theta, rho)
+    return ra, dec, px
 
-def isotropic_cone(n_array, seed, radius, phi_0, theta_0, alpha):
-    rng = np.random.default_rng(seed=seed)
-    phi_pole = rng.uniform(0, 2*np.pi, n_array)
-    u_pole = rng.uniform(0, 1, n_array)
-    theta_pole = np.arccos(1 - u_pole * (1 - np.cos(alpha)))
-    
-    points_pole = sph2vec(phi_pole, theta_pole)
-    axis = sph2vec(phi_0, theta_0)
-    R = rotation_matrix_from_z(axis)
-    points = points_pole @ R.T
-    phi, theta = vec2sph(points)
+def isotropic_ball(n_array, seed_coord=42, radius=np.nan):
+    rng = np.random.default_rng(seed=seed_coord)
+    phi = rng.uniform(0, 2*np.pi, n_array)
+    cos_theta = rng.uniform(-1, 1, n_array)
+    theta = np.arccos(cos_theta)
     rho = radius * rng.uniform(0, 1, n_array) ** (1/3)
-    return phi, theta, rho
+    ra, dec, px = sph2psr(phi, theta, rho)
+    return ra, dec, px
 
-def isotropic_cap(n_array, seed, radius, phi_0, theta_0, alpha):
-    rng = np.random.default_rng(seed=seed)
+def isotropic_cap(n_array, seed_coord=42, radius=np.nan, ra_0=0.0, dec_0=0.0, alpha=45.0):
+    phi_0, theta_0, _ = psr2sph(ra_0, dec_0)
+    alpha = np.deg2rad(alpha)
+    rng = np.random.default_rng(seed=seed_coord)
     phi_pole = rng.uniform(0, 2*np.pi, n_array)
     u_pole = rng.uniform(0, 1, n_array)
     theta_pole = np.arccos(1 - u_pole * (1 - np.cos(alpha)))
@@ -96,11 +92,30 @@ def isotropic_cap(n_array, seed, radius, phi_0, theta_0, alpha):
     points = points_pole @ R.T
     phi, theta = vec2sph(points)
     rho = radius * np.ones(n_array)
-    
-    return phi, theta, rho
+    ra, dec, px = sph2psr(phi, theta, rho)
+    return ra, dec, px
 
-def isotropic_ring(n_array, seed, radius, phi_0, theta_0, alpha):
-    rng = np.random.default_rng(seed=seed)
+def isotropic_cone(n_array, seed_coord=42, radius=np.nan, ra_0=0.0, dec_0=0.0, alpha=45.0):
+    phi_0, theta_0, _ = psr2sph(ra_0, dec_0)
+    alpha = np.deg2rad(alpha)
+    rng = np.random.default_rng(seed=seed_coord)
+    phi_pole = rng.uniform(0, 2*np.pi, n_array)
+    u_pole = rng.uniform(0, 1, n_array)
+    theta_pole = np.arccos(1 - u_pole * (1 - np.cos(alpha)))
+    
+    points_pole = sph2vec(phi_pole, theta_pole)
+    axis = sph2vec(phi_0, theta_0)
+    R = rotation_matrix_from_z(axis)
+    points = points_pole @ R.T
+    phi, theta = vec2sph(points)
+    rho = radius * rng.uniform(0, 1, n_array) ** (1/3)
+    ra, dec, px = sph2psr(phi, theta, rho)
+    return ra, dec, px
+
+def isotropic_ring(n_array, seed_coord=42, radius=np.nan, ra_0=0.0, dec_0=0.0, alpha=45.0):
+    phi_0, theta_0, _ = psr2sph(ra_0, dec_0)
+    alpha = np.deg2rad(alpha)
+    rng = np.random.default_rng(seed=seed_coord)
     phi_pole = rng.uniform(0, 2*np.pi, n_array)
     u_pole = np.ones(n_array)
     theta_pole = np.arccos(1 - u_pole * (1 - np.cos(alpha)))
@@ -111,38 +126,28 @@ def isotropic_ring(n_array, seed, radius, phi_0, theta_0, alpha):
     points = points_pole @ R.T
     phi, theta = vec2sph(points)
     rho = radius * np.ones(n_array)
-    
-    return phi, theta, rho
+    ra, dec, px = sph2psr(phi, theta, rho)
+    return ra, dec, px
 
-# Pulsar Names
-
-def get_name(ra, dec, prefix='S'):
-    ra_h = np.floor(ra/15.0).astype(int)
-    ra_m = np.floor(np.round((ra/15.0 - ra_h) * 60, decimals=1)).astype(int)
-    dec_d = np.floor(np.abs(dec)).astype(int)
-    dec_m = np.floor(np.round((np.abs(dec) - dec_d) * 60, decimals=1)).astype(int)
-    dec_s = "+" if np.sign(dec)>=0.0 else "-"
-    name = f"{prefix}{ra_h:02d}{ra_m:02d}{dec_s}{dec_d:02d}{dec_m:02d}"
-    return name
-
-def get_names(ra, dec, prefix='S'):
-    base_names = [get_name(r, d, prefix) for r, d in zip(ra, dec)]
-    freq = Counter(base_names)
-    counters = {name: 0 for name in freq}
-    final_names = []
-    for name in base_names:
-        cnt = counters[name]
-        if cnt == 0:
-            final_names.append(name)
-        else:
-            if cnt <= 26:
-                suffix = chr(ord('A') + cnt - 1)
-            else:
-                idx = cnt - 27
-                first = chr(ord('a') + idx // 26)
-                second = chr(ord('a') + idx % 26)
-                suffix = first + second
-            final_names.append(name + suffix)
-        counters[name] += 1
-    
-    return final_names
+COORDS = {
+    'sphere': {
+        'distr': isotropic_sphere,
+        'params': ['seed_coord', 'radius'],
+    },
+    'ball': {
+        'distr': isotropic_ball,
+        'params': ['seed_coord', 'radius'],
+    },
+    'cap':{
+        'distr': isotropic_cap,
+        'params': ['seed_coord', 'radius', 'ra_0', 'dec_0', 'alpha']
+    }, 
+    'cone': {
+        'distr': isotropic_cone,
+        'params': ['seed_coord', 'radius', 'ra_0', 'dec_0', 'alpha'],
+    },
+    'ring': {
+        'distr': isotropic_ring,
+        'params': ['seed_coord', 'radius', 'ra_0', 'dec_0', 'alpha'],
+    },
+}

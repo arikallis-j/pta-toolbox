@@ -2,6 +2,7 @@
 
 # Mapping from Pulsar attribute names to ATNF column names
 ATNF_FORMAT = {
+    'origin': 'TYPE',
     'name': 'PSRJ',
     'ra': 'RAJD',
     'dec': 'DECJD',

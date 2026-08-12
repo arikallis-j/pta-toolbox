@@ -27,10 +27,10 @@ class Catalog:
         new_data = pd.concat([self.data, make_data(pulsars)], ignore_index=True)
         return Catalog(data=new_data, name=self.name)
     
-    def sample(self, n_psr: int, seed: int = 42, replace: bool = False) -> 'Catalog':
+    def sample(self, n_psr: int, seed: int = 42) -> 'Catalog':
         """Return a new catalog with a random sample of n pulsars."""
-        sample_data = self.data.sample(n_psr, random_state=seed, replace=replace)
-        new_name = f"{self.name}-n{n_psr}-s{seed}" + ("-rep" if replace else "")
+        sample_data = self.data.sample(n_psr, random_state=seed)
+        new_name = f"{self.name}-n{n_psr}-s{seed}"
         return Catalog(data=sample_data, name=new_name)
     
     def filter_by_names(self, names: List[str]) -> 'Catalog':

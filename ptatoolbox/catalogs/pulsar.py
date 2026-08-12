@@ -11,7 +11,8 @@ class Pulsar(NamedTuple):
     name: str
     ra: float                   # deg
     dec: float                  # deg
-    f0: float = 1.0             # Hz
+    origin: str = 'REL'         # REL | SIM | SYN | MIX
+    f0: float = float('nan')    # Hz
     f1: float = float('nan')    # s^-2
     pmra: float = float('nan')  # mas yr^-1
     pmdec: float = float('nan') # mas yr^-1

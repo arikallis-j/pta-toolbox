@@ -5,21 +5,19 @@ dm = pta.DataManager()
 path = dm.create_experiment("test")
 storage = dm.storage
 
-# Load pre-cut atnf catalog 
+atnf = pta.load_catalog(storage, pta.ATNF_STEM, prefix=False)
 cut_atnf = pta.load_catalog(storage, pta.CUT_ATNF_STEM, prefix=False)
-print(cut_atnf.sample(n_psr=100, seed=42))
+cut_atnf.name = 'atnf'
 
-# Make synthetic mixed with pre-cut atnf catalog by method `cone`
-catalog = pta.make_catalog(
-    real_catalog=cut_atnf,
-    n_psr=100,
-    seed=42,
-    name='test', 
-    method='cone',
-    params={'seed_psr': 42, 'alpha': 20.0, 'ra_0': 0.0, 'dec_0': 0.0},
-    fields=['PSRJ', 'RAJD', 'DECJD']
-)
+config = {
+    'coords': 'sphere',
+    # 'freqs': 'const',
+    # 'params': {
+    #     'f0': pta.F0_PSR,
+    #     'f1': pta.F1_PSR,
+    # }
+}
 
-print(catalog)
-pta.plot_catalog(catalog, path)
-pta.plot_pulsars(catalog, path)
+simple_cat = pta.make_catalog(100, config, mode='simple')
+print(simple_cat)
+pta.plot_catalog(simple_cat, path)
