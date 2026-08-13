@@ -1,6 +1,3 @@
-from .io import *
-from .core import *
-from .visuals import *
-
-from .catalogs import *
-from .gwb import *
+from .utils import *
+from .analysis import *
+from .simulation import *

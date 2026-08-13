@@ -3,23 +3,19 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ptatoolbox"
+name = "pta_catalog"
 version = "0.1.0"
-description = "Pulsar Timing Array Toolbox for GW simulations and sky imaging"
+description = "A small library for pta catalog's generation"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
-authors = [
-    {name = "Slava Chernosov", email = "chernosov.w@gmail.com"},
-]
-
+authors = [{name = "Slava Chernosov", email = "chernosov.w@gmail.com"}]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Astronomy",
     "Programming Language :: Python :: 3.11",
 ]
-
 dependencies = [
     "numpy>=1.24",
     "scipy>=1.10",
@@ -37,9 +33,4 @@ dependencies = [
     "ptmcmcsampler>=1.0",
     "colorlog>=6.7",
     "jupyter>=1.0",
-    "pta_catalog",
 ]
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["ptatoolbox*"]

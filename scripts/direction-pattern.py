@@ -1,10 +1,10 @@
 import numpy as np
 import healpy as hp
 import matplotlib.pyplot as plt
-
 from scipy.special import spherical_jn, eval_legendre
 
-import ptatoolbox as pta
+import ptatoolbox as pta 
+dm = pta.DataManager()
 
 def unit_vector_from_angles(theta, phi):
     """
@@ -126,7 +126,7 @@ def K_vs_theta(y, theta, lmax):
     return out
 
 
-def plot_directional_pattern(y, lmax, npoints=500, save_dir="data", with_phase=True):
+def plot_directional_pattern(path, y, lmax, npoints=500, save_dir="data", with_phase=True):
     """
     Строит диаграмму направленности:
       - левый подграфик: |K|(θ) в полярных координатах,
@@ -160,11 +160,11 @@ def plot_directional_pattern(y, lmax, npoints=500, save_dir="data", with_phase=T
     ax1.grid(True)
 
     plt.tight_layout()
-    plt.savefig(f"{save_dir}/DP-{y:.0f}y.png", dpi=300, bbox_inches='tight')
+    plt.savefig(f"{path}/DP-{y:.0f}y.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 
-def plot_directional_filter(y, lmax, npoints=500, save_dir="data", with_phase=True):
+def plot_directional_filter(path, y, lmax, npoints=500, save_dir="data", with_phase=True):
     """
     Строит диаграмму направленности:
       - левый подграфик: |K|(θ) в полярных координатах,
@@ -195,10 +195,10 @@ def plot_directional_filter(y, lmax, npoints=500, save_dir="data", with_phase=Tr
     ax1.grid(True)
 
     plt.tight_layout()
-    plt.savefig(f"{save_dir}/DF-648y-ph/DF-{lmax}l.png", dpi=300, bbox_inches='tight') # {y:.0f}y
+    plt.savefig(f"{path}/DF-{lmax}l.png", dpi=300, bbox_inches='tight') # {y:.0f}y
     # plt.show()
 
-def plot_K_amplitude(y, khat_prime, nside, lmax, nest=False, cmap="viridis"):
+def plot_K_amplitude(path, y, khat_prime, nside, lmax, nest=False, cmap="viridis"):
     """
     Рисует карту |K|.
     """
@@ -214,12 +214,12 @@ def plot_K_amplitude(y, khat_prime, nside, lmax, nest=False, cmap="viridis"):
         cbar=True,
     )
     hp.graticule()
-    plt.savefig("data/Amp.png")
+    plt.savefig(f"{path}/Amp.png")
 
     return Kmap, amp
 
 
-def plot_K_phase(y, khat_prime, nside, lmax, nest=False):
+def plot_K_phase(path, y, khat_prime, nside, lmax, nest=False):
     """
     Рисует карту arg(K) в диапазоне [0, 2pi).
     """
@@ -243,7 +243,7 @@ def plot_K_phase(y, khat_prime, nside, lmax, nest=False):
         cbar=True,
     )
     hp.graticule()
-    plt.savefig("data/Phase.png")
+    plt.savefig(f"{path}/Phase.png")
 
     return Kmap, phase
 
@@ -264,12 +264,12 @@ print(y)
 theta_p = np.deg2rad(90.0)
 phi_p = np.deg2rad(0.0)
 khat_prime = unit_vector_from_angles(theta_p, phi_p)
-
+path = dm.create_experiment("DF-648y-ph")
 
 # nside = 1000
 for lmax in range(2, 50):#int(y*1.1) 
-    plot_directional_filter(y, lmax, npoints=10_000, with_phase=True)
-# plot_directional_pattern(y, lmax, npoints=1_000, with_phase=True)
+    plot_directional_filter(path, y, lmax, npoints=10_000, with_phase=True)
+# plot_directional_pattern(path, y, lmax, npoints=1_000, with_phase=True)
 
-# Kmap, amp = plot_K_amplitude(y, khat_prime, nside, lmax)
-# Kmap, phase = plot_K_phase(y, khat_prime, nside, lmax)
+# Kmap, amp = plot_K_amplitude(path, y, khat_prime, nside, lmax)
+# Kmap, phase = plot_K_phase(path, y, khat_prime, nside, lmax)

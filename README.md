@@ -2,16 +2,22 @@
 
 Pulsar Timing Array Toolbox for GW simulations and sky imaging
 
-## How to install
+## Setup enviroment
 
 Create conda enviroment:
 
 ```bash
-conda env create -f environment.yml
+conda env create -f environment/conda_env.yaml
 ```
 
-Install `pta-toolbox`:
+Update conda enviroment:
 
 ```bash
-pip install -e .
+conda env update -f environment/conda_env.yaml
+```
+
+Download pip dependencies:
+
+```bash
+pip install -r environment/requirements.txt
 ```

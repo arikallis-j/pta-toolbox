@@ -9,7 +9,6 @@ from collections import Counter
 
 
 from .pickle_io import load_data, dump_data
-from .manager import DataManager
 from ..core.constants import ATNF_FORMAT
 
 ATNF_STEM = "atnf"

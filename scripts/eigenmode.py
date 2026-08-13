@@ -1,4 +1,5 @@
 import ptatoolbox as pta
+import pta_catalog as ptacat
 import numpy as np
 import healpy as hp
 import matplotlib.pyplot as plt
@@ -16,13 +17,13 @@ config = {
     }
 }
 
-# simple_cat = pta.make_catalog(100, {}, mode='simple')
+# simple_cat = ptacat.make_catalog(100, {}, mode='simple')
 # simple_cat = simple_cat.add(cap_cat.pulsars())
 N_psr = 100
-simple_cat = pta.make_catalog(N_psr, config, mode='simple')
+simple_cat = ptacat.make_catalog(N_psr, config, mode='simple')
 
 print(simple_cat)
-pta.plot_catalog(simple_cat, path)
+ptacat.plot_catalog(simple_cat, path)
 pulsars = simple_cat.pulsars()
 
 nside = 100
@@ -32,22 +33,22 @@ dOmega = hp.nside2pixarea(nside)
 Omega = np.column_stack(vecs).T
 
 alpha = - 1
-F_plus = alpha * pta.antenna_pattern(pulsars[0], Omega, 1)
-F_cross = alpha * pta.antenna_pattern(pulsars[0], Omega, -1)
+F_plus = alpha * ptacat.antenna_pattern(pulsars[0], Omega, 1)
+F_cross = alpha * ptacat.antenna_pattern(pulsars[0], Omega, -1)
 alm_E, alm_B = hp.map2alm_spin(
     [F_plus, F_cross],
     spin=2
 )
-alm_e = pta.get_alm_emode(pulsars[0], nside=nside)
-direction = - pta.to_vec(pulsars[0])
-azimuth, response = pta.average_over_phi(direction, alm_e, nside=nside)
-pta.plot_directional_pattern(azimuth, response, path, name='-base')
+alm_e = ptacat.get_alm_emode(pulsars[0], nside=nside)
+direction = - ptacat.to_vec(pulsars[0])
+azimuth, response = ptacat.average_over_phi(direction, alm_e, nside=nside)
+ptacat.plot_directional_pattern(azimuth, response, path, name='-base')
 
-# pta.plot_map(alm_E, path, name='antenna', catalog=simple_cat, nside=nside)
-# pta.plot_map(alm_e, path, name='e-mode', catalog=simple_cat, nside=nside)
+# ptacat.plot_map(alm_E, path, name='antenna', catalog=simple_cat, nside=nside)
+# ptacat.plot_map(alm_e, path, name='e-mode', catalog=simple_cat, nside=nside)
 
-# pta.plot_Cl(alm_e, path)
-# pta.plot_Cl(alm_E, path)
+# ptacat.plot_Cl(alm_e, path)
+# ptacat.plot_Cl(alm_E, path)
 L = 1000  # максимальное значение l
 l_values = np.arange(L + 1)  
 counts = 2 * l_values + 1
@@ -57,7 +58,7 @@ l_arr = l_arr[mask]
 Nl = np.sqrt(2/((l_arr+2)*(l_arr+1)*l_arr*(l_arr-1)))
 
 N_modes = 100
-modes, vals = pta.eigenmodes(pulsars)
+modes, vals = ptacat.eigenmodes(pulsars)
 counts = [k+1 for k in range(len(vals))]
 
 num, sigma = counts[:N_modes:], vals[:N_modes:]
@@ -90,8 +91,8 @@ for k in range(N):
     h_cross = cross_modes[k](Omega)
     sigma = vals[k]
     alm_E, alm_B = hp.map2alm_spin([h_plus, h_cross], spin=2)
-    pta.plot_map((-1)*alm_E, path, name=f'e-m{k+1}', catalog=simple_cat)
-    # pta.plot_map(alm_e, path, name=f'e-m{k+1}-true')
-    # pta.plot_power_mode(plus_modes[k], cross_modes[k], path, catalog=simple_cat)
-    # azimuth, response = pta.average_over_phi(direction, alm_E, nside=nside)
-    # pta.plot_directional_pattern(azimuth, response, path, name=f'-m{k+1}')
+    ptacat.plot_map((-1)*alm_E, path, name=f'e-m{k+1}', catalog=simple_cat)
+    # ptacat.plot_map(alm_e, path, name=f'e-m{k+1}-true')
+    # ptacat.plot_power_mode(plus_modes[k], cross_modes[k], path, catalog=simple_cat)
+    # azimuth, response = ptacat.average_over_phi(direction, alm_E, nside=nside)
+    # ptacat.plot_directional_pattern(azimuth, response, path, name=f'-m{k+1}')
