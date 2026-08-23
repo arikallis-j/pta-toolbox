@@ -26,7 +26,4 @@ dependencies:
   - snakemake
   - pip
   - pip:
-    - typer>=0.9.0
-    - colorlog
-    - -e ../lib/pta_catalog
-    - -e ..
+    - -r requirements.txt

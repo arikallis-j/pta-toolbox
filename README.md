@@ -19,5 +19,11 @@ conda env update -f environment/conda_env.yaml
 Download pip dependencies:
 
 ```bash
-pip install -r environment/requirements.txt
+cd environment && pip install -r requirements.txt && cd ..
+```
+
+Freeze current python dependencies:
+
+```bash
+pip list --not-required --format=freeze > environment/backup/requirements.txt.backup
 ```

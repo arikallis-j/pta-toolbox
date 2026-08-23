@@ -19,5 +19,7 @@ netCDF4>=1.6
 pyyaml>=6.0
 snakemake>=7.0
 typer>=0.9.0
--e ./lib/pta_catalog
--e .
+s2fft>=1.1.0
+jax>=0.9.0
+-e ../lib/pta_catalog
+-e ..
