@@ -16,7 +16,7 @@ def get_cartesian(ra, dec, px):
     z = D * np.sin(dec)
     return x, y, z
 
-def plot_catalog(catalog, path, show=False, save=True):
+def plot_catalog(catalog, path, show=False):
     ra, dec = catalog.data['RAJD'], catalog.data['DECJD']
     ra = np.where(ra>=180, ra-360, ra)
     ra *= np.pi/180
@@ -26,13 +26,13 @@ def plot_catalog(catalog, path, show=False, save=True):
     plt.title(f"{catalog.name} pulsar catalog")
     plt.grid(True)
     plt.plot(ra, dec, 'o', markersize=2)
-    if save:
+    if path is not None:
         plt.savefig(path / f"{catalog.name}_cat.png", dpi=1000)
     if show:
         plt.show()
     plt.close()
 
-def plot_pulsars(catalog, path, show=False, save=True):
+def plot_pulsars(catalog, path, show=False):
     ra, dec, px = catalog.data['RAJD'], catalog.data['DECJD'], catalog.data['PX']
     x, y, z = get_cartesian(ra, dec, px)
     fig = plt.figure(figsize=(7, 7))
@@ -48,7 +48,7 @@ def plot_pulsars(catalog, path, show=False, save=True):
     ax.set_title("Distribution of Pulsar Array")
     ax.legend()
     
-    if save:
+    if path is not None:
         plt.savefig(path / f"{catalog.name}_pta.png", dpi=1000)
     if show:
         plt.show()

@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from scipy.special import sph_harm_y as sph_harm
 
 
-def main(nside: int = 50, n_psr: int = 10, show: bool = False, sigma: float = 0.1, modes: int = None, lobs: int = None):
+def main(nside: int = 50, n_psr: int = 10, show: bool = False, sigma: float = 0.1, modes: int | None = None, lobs: int | None = None):
     lmax = 2 * nside
     dm = pta.utils.DataManager()
     path = dm.create_experiment("eigenmodes")

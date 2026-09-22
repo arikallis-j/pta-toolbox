@@ -23,10 +23,20 @@ def calc_Nl(nside):
         if l>1:
             nl[idx : idx + n_m] = np.sqrt(2/((l-1)*(l)*(l+1)*(l+2)))
         else:
-            nl[idx : idx + n_m] = np.nan
+            nl[idx : idx + n_m] = 0.0
         idx += n_m
     Nl = vec2mat_sph(nl, nside)
     return Nl
+
+def lin2circ(h_plus, h_cross):
+    h_left = 1/np.sqrt(2) * (h_plus + 1j*h_cross)
+    h_right = 1/np.sqrt(2) * (h_plus - 1j*h_cross)
+    return h_left, h_right
+
+def circ2lin(h_left, h_right):
+    h_plus = 1/np.sqrt(2) * (h_left + h_right)
+    h_cross = 1/(1j*np.sqrt(2)) * (h_left - h_right)
+    return h_plus, h_cross
 
 def lr2gc_alm(alm_l, alm_r):
     alm_g = alm_l + alm_r
@@ -73,3 +83,19 @@ def inverse_sfft2(F_lm, nside, spin=0, L_lower=None):
         L_lower = abs(spin)
     f = s2fft.inverse(F_lm, L, spin=spin, L_lower=L_lower, nside=nside, sampling="healpix", method="numpy")
     return f
+
+def make_stochastic(nside, key: int = 42):
+    Nl = calc_Nl(nside)
+    plm = Nl / 2 * generate_flm(nside, key=key)
+    return plm
+
+def psi2hpol(nside, plm_g, plm_c = None):
+    Nl = calc_Nl(nside)
+    if plm_c is None:
+        plm_c = np.zeros_like(plm_g)
+    alm_g, alm_c = plm2alm(plm_g, plm_c, Nl)
+    alm_l, alm_r = gc2lr_alm(alm_g, alm_c)
+    h_left = inverse_sfft2(alm_l, nside, spin=2)
+    h_right = inverse_sfft2(alm_r, nside, spin=-2)
+    h_plus, h_cross = circ2lin(h_left, h_right) 
+    return h_plus, h_cross

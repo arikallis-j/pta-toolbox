@@ -1,21 +1,12 @@
 import numpy as np
 import healpy as hp
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 
 def map_decomposition(h):
     amplitude = np.abs(h)
     phase = np.mod(np.angle(h), 2 * np.pi)
     return amplitude, phase
-
-def lin2circ(h_plus, h_cross):
-    h_left = 1/np.sqrt(2) * (h_plus + 1j*h_cross)
-    h_right = 1/np.sqrt(2) * (h_plus - 1j*h_cross)
-    return h_left, h_right
-
-def circ2lin(h_left, h_right):
-    h_plus = 1/np.sqrt(2) * (h_left + h_right)
-    h_cross = 1/(1j*np.sqrt(2)) * (h_left - h_right)
-    return h_plus, h_cross
 
 def Stokes_parameters(h_plus, h_cross):
     I = np.abs(h_plus)**2 + np.abs(h_cross)**2
@@ -74,10 +65,14 @@ def plot_maps(h, name='maps', show=True, path=None, grid=True):
         plt.show()
     plt.close()
 
-def plot_intensities(h_plus, h_cross, name='stokes-I', show=True, path=None, grid=True):
+def plot_intensities(h_plus, h_cross, name='stokes-I', show=True, path=None, grid=True, log=False):
     I, Q, U, V = Stokes_parameters(h_plus, h_cross)
     plt.figure(figsize=(6, 8))
-    hp.mollview(I, sub=211, title='Total Intensity', cmap='inferno', min=0.0)
+    if log:
+        norm = LogNorm()
+    else:
+        norm = None
+    hp.mollview(I, sub=211, title='Total Intensity', cmap='inferno', min=0.0, norm=norm)
     if grid:
         hp.graticule()
     hp.mollview(V, sub=212, title='Total Сhirality', cmap='coolwarm', min=-np.max(np.abs(V)), max=np.max(np.abs(V)))
@@ -148,3 +143,35 @@ def plot_angular_spectrum(cl, L, log=False, lcut=None):
         plt.loglog()
     plt.grid(True)
     plt.show()
+
+def plot_Cl(cl, path = None, name='cl', l_start=2, l_max=1000, show=False):
+    ell = np.arange(len(cl))
+    l_mean = np.sum(cl * ell) / np.sum(cl)
+    f_peak = np.max(cl) / np.sum(cl)
+    print(f"l_mean = {l_mean:.2f}")
+    print(f"f_mean = {f_peak:.2f}")
+
+    el = ell[l_start:l_max:]
+    Nl = np.sqrt(2/((el+2)*(el+1)*el*(el-1)))
+    theory = Nl**2 / 10
+    # print(cl[l_start:l_max:]/theory)
+    plt.plot(ell[l_start:l_max:], cl[l_start:l_max:], label='E-mode (grad)', color='blue')
+    plt.plot(ell[l_start:l_max:], theory,  label='theory',  linestyle='--', color='black')
+    
+    plt.xlabel('Multipole l')
+    plt.ylabel('$C_l$')
+    plt.loglog()
+    plt.legend()
+    
+    if path is not None:
+        plt.savefig(path / f"{name}.png", dpi=1000)
+    if show:
+        plt.show()
+    plt.close()
+
+def plot_statistics(h_plus, h_cross, path = None, show = True):
+    plot_map(h_plus, name='h-plus', path=path, show=show)
+    plot_map(h_cross, name='h-cross', path=path, show=show)
+    plot_intensities(h_plus, h_cross, path=path, show=show)
+    plot_polarization_degrees(h_plus, h_cross, path=path, show=show)
+    plot_Stokes_parameters(h_plus, h_cross, path=path, show=show)

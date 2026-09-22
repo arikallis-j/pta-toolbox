@@ -5,6 +5,7 @@ channels:
   - defaults
 dependencies:
   - python=3.11
+  - setuptools=70.0.0
   - jupyter
   - numpy
   - scipy
@@ -20,10 +21,10 @@ dependencies:
   - enterprise_extensions
   - dynesty
   - ptmcmcsampler
-  - setuptools>=70.0.0
   - netcdf4
   - pyyaml
   - snakemake
+  - typer
   - pip
   - pip:
     - -r requirements.txt

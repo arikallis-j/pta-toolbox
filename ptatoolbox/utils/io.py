@@ -26,6 +26,12 @@ class DataManager:
         experiment.mkdir(exist_ok=True)
         return experiment
 
+    def make_dir(self, path, name: str) -> Path:
+        """Create a new directory inside the given path."""
+        new_dir = path / name
+        new_dir.mkdir(exist_ok=True)
+        return new_dir
+
     def storage_file_path(self, filename: str = "") -> Path:
         """Return a path to a file inside the storage directory."""
         return self.storage / filename
