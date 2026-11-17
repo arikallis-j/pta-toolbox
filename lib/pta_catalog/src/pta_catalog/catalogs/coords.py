@@ -39,6 +39,14 @@ def vec2sph(vec):
     phi = np.where(phi < 0, phi + 2*np.pi, phi)
     return phi, theta
 
+def vec2ball(vec):
+    x, y, z = vec2cart(vec)
+    r = np.linalg.norm(vec, axis=1)
+    theta = np.arccos(z / r)
+    phi = np.arctan2(y, x)
+    phi = np.where(phi < 0, phi + 2*np.pi, phi)
+    return phi, theta, r
+
 def vec2psr(vec):
     phi, theta = vec2sph(vec)
     ra, dec, px = sph2psr(phi, theta)

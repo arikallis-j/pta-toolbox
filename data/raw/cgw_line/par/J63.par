@@ -1,0 +1,30 @@
+PSRJ           J63
+RAJ             03:08:10.2326383         1  0.00000109358866442724   
+DECJ           +38:20:03.84624           1  0.00002916268262577251   
+F0             5.2815760000000047114     1  2.0309425559321663209e-15
+F1             -1.4600000009012594114e-13 1  1.2515160981226750892e-23
+PEPOCH         53000                       
+POSEPOCH       53000                       
+DMEPOCH        53000                       
+DM             224.37999999999999545       
+PMRA           12.204247555499836864     1  0.00224630505659274404   
+PMDEC          9.9733338754475102661     1  0.00501344563514011157   
+PX             3.9879265390511626777     1  0.02321504277450305714   
+TZRMJD         53000.00000000950433        
+TZRFRQ         1440                     
+TZRSITE        AXIS   
+TRES           0.000        
+EPHVER         5                           
+NE_SW          4                           
+CLK            TT(TAI)
+MODE 1
+UNITS          TCB
+TIMEEPH        IF99
+DILATEFREQ     Y
+PLANET_SHAPIRO Y
+T2CMETHOD      IAU2000B
+CORRECT_TROPOSPHERE  Y
+EPHEM          DE414
+NITS           1
+NTOA           0
+CHI2R          -nan 0

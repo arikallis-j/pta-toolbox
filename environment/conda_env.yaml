@@ -25,6 +25,7 @@ dependencies:
   - pyyaml
   - snakemake
   - typer
+  - spherical
   - pip
   - pip:
     - -r requirements.txt

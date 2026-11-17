@@ -5,6 +5,6 @@ from .factory import (
     make_catalog, 
     make_mixed_catalog,
 )
-from .coords import COORDS
+from .coords import COORDS, sph2psr, psr2sph, vec2ball, isotropic_ball
 from .freqs import FREQS, F0_PSR, F1_PSR, F0_MSC, F1_MSC
 from .galactics import GALACTICS
